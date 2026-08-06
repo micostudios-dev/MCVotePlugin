@@ -31,10 +31,12 @@ public final class VelocitySyncListener {
 
         if (!(event.getSource() instanceof ServerConnection sender)) {
             logger.warn("Dropped a " + SyncProtocol.CHANNEL + " frame that did not come from a backend server");
+
             return;
         }
 
         byte[] response = handler.handle(event.getData());
+
         if (response != null) {
             sender.sendPluginMessage(IDENTIFIER, response);
         }

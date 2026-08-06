@@ -44,13 +44,16 @@ public final class VoteService {
     public VoteProcessResult process(Vote vote) {
         String username = vote.username().toLowerCase(Locale.ROOT);
         long serverNow = System.currentTimeMillis();
+
         if (antiAbuse.enabled()) {
             String reason = abuseReason(username, vote.serviceName(), serverNow);
+
             if (reason != null) {
                 logger.warn("Vote from " + vote.username() + " via " + vote.serviceName()
                         + " rejected by anti-abuse (" + reason + ")");
                 return VoteProcessResult.rejected(username);
             }
+
             storage.recordVoteHistory(username, vote.serviceName(), serverNow);
         }
 
@@ -72,6 +75,7 @@ public final class VoteService {
         storage.enqueue(username, DeliveryType.VOTE, vote.serviceName(), serverNow);
 
         String milestoneId = resolveMilestone(streak, advancedDay);
+
         if (milestoneId != null) {
             storage.enqueue(username, DeliveryType.STREAK, milestoneId, serverNow);
         }
@@ -98,18 +102,22 @@ public final class VoteService {
     private String abuseReason(String username, String service, long serverNow) {
         if (antiAbuse.cooldownMs() > 0) {
             long last = storage.lastServiceVoteMs(username, service);
+
             if (last > 0 && serverNow - last < antiAbuse.cooldownMs()) {
                 return "cooldown: " + ((antiAbuse.cooldownMs() - (serverNow - last)) / 1000L) + "s left";
             }
         }
+
         if (antiAbuse.maxDailyVotes() > 0) {
             long dayStart = LocalDate.ofInstant(Instant.ofEpochMilli(serverNow), streakConfig.zone())
                     .atStartOfDay(streakConfig.zone()).toInstant().toEpochMilli();
             int today = storage.countVotesSince(username, dayStart);
+
             if (today >= antiAbuse.maxDailyVotes()) {
                 return "daily cap: " + today + "/" + antiAbuse.maxDailyVotes();
             }
         }
+
         return null;
     }
 
@@ -117,12 +125,15 @@ public final class VoteService {
         if (!streakConfig.enabled()) {
             return 0;
         }
+
         if (previousDay == today) {
             return Math.max(previousStreak, 1);
         }
+
         if (previousDay == today - 1) {
             return previousStreak + 1;
         }
+
         return 1;
     }
 
@@ -130,7 +141,9 @@ public final class VoteService {
         if (!streakConfig.enabled() || !advancedDay) {
             return null;
         }
+
         StreakTier tier = streakConfig.tierFor(streak);
+
         return tier == null ? null : tier.id();
     }
 
@@ -141,6 +154,7 @@ public final class VoteService {
             for (PlayerRef player : online) {
                 storage.enqueue(player.name().toLowerCase(Locale.ROOT), DeliveryType.PARTY, "", now);
             }
+
             if (partyConfig.broadcastMessage() != null && !partyConfig.broadcastMessage().isBlank()) {
                 broadcaster.broadcast(partyConfig.broadcastMessage());
             }

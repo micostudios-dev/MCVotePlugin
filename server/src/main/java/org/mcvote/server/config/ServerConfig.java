@@ -83,42 +83,51 @@ public final class ServerConfig {
     public static Messages messagesFrom(FileConfiguration langCfg) {
         Map<String, String> values = readStringMap(langCfg);
         values.remove("prefix");
+
         return new Messages(langCfg.getString("prefix", ""), values, readListMap(langCfg));
     }
 
     private static List<StreakTier> readTiers(ConfigurationSection section) {
         List<StreakTier> tiers = new ArrayList<>();
+
         if (section != null) {
             for (String id : section.getKeys(false)) {
                 tiers.add(new StreakTier(id, section.getInt(id)));
             }
         }
+
         tiers.sort((a, b) -> Integer.compare(a.required(), b.required()));
+
         return tiers;
     }
 
     private static Map<String, String> readTokens(ConfigurationSection section) {
         Map<String, String> tokens = new LinkedHashMap<>();
+
         if (section != null) {
             for (String service : section.getKeys(false)) {
                 tokens.put(service, section.getString(service, ""));
             }
         }
+
         return tokens;
     }
 
     private static Map<String, RewardBundle> readStreakRewards(ConfigurationSection section) {
         Map<String, RewardBundle> rewards = new LinkedHashMap<>();
+
         if (section != null) {
             for (String id : section.getKeys(false)) {
                 rewards.put(id, RewardBundle.parse(section.getStringList(id)));
             }
         }
+
         return rewards;
     }
 
     private static Map<String, String> readStringMap(ConfigurationSection section) {
         Map<String, String> values = new LinkedHashMap<>();
+
         if (section != null) {
             for (String key : section.getKeys(false)) {
                 if (section.isString(key)) {
@@ -126,11 +135,13 @@ public final class ServerConfig {
                 }
             }
         }
+
         return values;
     }
 
     private static Map<String, List<String>> readListMap(ConfigurationSection section) {
         Map<String, List<String>> lists = new LinkedHashMap<>();
+
         if (section != null) {
             for (String key : section.getKeys(false)) {
                 if (section.isList(key)) {
@@ -138,6 +149,7 @@ public final class ServerConfig {
                 }
             }
         }
+
         return lists;
     }
 
@@ -202,6 +214,7 @@ public final class ServerConfig {
             summary.append(", streak.").append(entry.getKey())
                     .append(' ').append(entry.getValue().actions().size());
         }
+
         return summary.toString();
     }
 }

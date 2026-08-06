@@ -43,8 +43,10 @@ public final class VelocityVoteCommand implements SimpleCommand {
 
     private void info(CommandSource source) {
         VoteReceiver receiver = plugin.receiver();
+
         if (receiver == null) {
             send(source, "<red>The vote receiver is not running. Check the console.");
+
             return;
         }
 
@@ -58,6 +60,7 @@ public final class VelocityVoteCommand implements SimpleCommand {
 
     private static String copyable(String value) {
         String safe = MiniMessageText.escape(value);
+
         return "<click:copy_to_clipboard:'" + safe + "'>"
                 + "<hover:show_text:'<gray>Click to copy'><white>" + safe + "</white></hover></click>";
     }

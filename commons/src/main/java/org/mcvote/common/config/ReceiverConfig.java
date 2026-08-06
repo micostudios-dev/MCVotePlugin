@@ -20,11 +20,13 @@ public record ReceiverConfig(
     public ReceiverConfig {
         host = host == null ? "" : host.trim();
         apiKey = apiKey == null ? "" : apiKey.trim();
+
         if (apiKey.equalsIgnoreCase(PLACEHOLDER_KEY)) {
             apiKey = "";
         }
 
         Map<String, String> normalized = new LinkedHashMap<>();
+
         if (tokens != null) {
             tokens.forEach((service, token) -> {
                 if (service != null && token != null && !token.isBlank()) {
@@ -32,14 +34,17 @@ public record ReceiverConfig(
                 }
             });
         }
+
         if (!normalized.containsKey(VotifierProtocol.DEFAULT_TOKEN) && !apiKey.isEmpty()) {
             normalized.put(VotifierProtocol.DEFAULT_TOKEN, apiKey);
         }
+
         tokens = Map.copyOf(normalized);
     }
 
     public String tokenFor(String serviceName) {
         String service = serviceName == null ? "" : serviceName.toLowerCase(Locale.ROOT);
+
         return tokens.getOrDefault(service, tokens.getOrDefault(VotifierProtocol.DEFAULT_TOKEN, ""));
     }
 }

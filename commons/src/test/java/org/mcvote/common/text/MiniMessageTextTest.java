@@ -80,12 +80,15 @@ class MiniMessageTextTest {
         if (component.clickEvent() != null) {
             return component.clickEvent();
         }
+
         for (Component child : component.children()) {
             ClickEvent found = clickOf(child);
+
             if (found != null) {
                 return found;
             }
         }
+
         return null;
     }
 }

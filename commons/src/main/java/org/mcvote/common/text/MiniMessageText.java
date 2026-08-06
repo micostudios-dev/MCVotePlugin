@@ -26,6 +26,7 @@ public final class MiniMessageText {
                 "k", "obfuscated", "l", "bold", "m", "strikethrough", "n", "underlined",
                 "o", "italic", "r", "reset"
         };
+
         for (int i = 0; i < colours.length; i += 2) {
             char code = colours[i].charAt(0);
             LEGACY_TAGS[code] = "<" + colours[i + 1] + ">";
@@ -40,6 +41,7 @@ public final class MiniMessageText {
         if (raw == null || raw.isEmpty()) {
             return Component.empty();
         }
+
         return MINI.deserialize(MINI_TAG.matcher(raw).find() ? raw : fromLegacyCodes(raw));
     }
 
@@ -51,16 +53,20 @@ public final class MiniMessageText {
         if (value == null || value.isEmpty()) {
             return "";
         }
+
         return value.replace("\\", "\\\\").replace("<", "\\<").replace("'", "\\'");
     }
 
     private static String fromLegacyCodes(String raw) {
         Matcher matcher = LEGACY_CODE.matcher(raw);
         StringBuilder out = new StringBuilder(raw.length() + 16);
+
         while (matcher.find()) {
             matcher.appendReplacement(out, Matcher.quoteReplacement(LEGACY_TAGS[matcher.group(1).charAt(0)]));
         }
+
         matcher.appendTail(out);
+
         return out.toString();
     }
 }

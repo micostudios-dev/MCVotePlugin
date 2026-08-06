@@ -17,6 +17,7 @@ public final class VoteSignature {
         try {
             Mac mac = Mac.getInstance(ALGO);
             mac.init(new SecretKeySpec(apiKey.getBytes(StandardCharsets.UTF_8), ALGO));
+
             return Base64.getEncoder().encodeToString(mac.doFinal(payload.getBytes(StandardCharsets.UTF_8)));
         } catch (Exception e) {
             throw new IllegalStateException("Unable to sign payload", e);
@@ -27,6 +28,7 @@ public final class VoteSignature {
         try {
             byte[] expected = Base64.getDecoder().decode(sign(payload, apiKey));
             byte[] provided = Base64.getDecoder().decode(base64Signature.trim());
+
             return MessageDigest.isEqual(expected, provided);
         } catch (Exception e) {
             return false;

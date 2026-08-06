@@ -50,16 +50,19 @@ public final class BungeeMCVotePlugin extends Plugin {
         this.audiences = BungeeAudiences.create(this);
 
         Configuration cfg = loadConfig();
+
         if (cfg == null) {
             return;
         }
 
         StorageType type = StorageType.from(cfg.getString("database.type", "sqlite"));
+
         if (type == StorageType.PROXY) {
             logger.error("database.type: proxy is meant for backends. This proxy is the node that owns "
                     + "the state, so use sqlite or mysql here.");
             return;
         }
+
         this.storageLabel = type.name().toLowerCase(Locale.ROOT);
 
         DatabaseConfig database = new DatabaseConfig(
@@ -73,10 +76,12 @@ public final class BungeeMCVotePlugin extends Plugin {
                 cfg.getInt("database.pool-size", 6));
 
         this.storage = StorageFactory.create(database, getDataFolder());
+
         try {
             storage.init();
         } catch (Exception e) {
             logger.error("Could not open the vote storage, MCVote will not listen", e);
+
             return;
         }
 
@@ -92,9 +97,11 @@ public final class BungeeMCVotePlugin extends Plugin {
     @Override
     public void onDisable() {
         stopReceiver();
+
         if (storage != null) {
             storage.close();
         }
+
         if (audiences != null) {
             audiences.close();
         }
@@ -106,11 +113,14 @@ public final class BungeeMCVotePlugin extends Plugin {
 
     public boolean reload() {
         Configuration cfg = loadConfig();
+
         if (cfg == null) {
             return false;
         }
+
         stopReceiver();
         applyConfig(cfg);
+
         return true;
     }
 
@@ -134,6 +144,7 @@ public final class BungeeMCVotePlugin extends Plugin {
                     .forEach(p -> refs.add(new PlayerRef(p.getUniqueId(), p.getName())));
             return refs;
         };
+
         Broadcaster broadcaster = message -> audiences.all().sendMessage(MiniMessageText.render(message));
 
         VoteService voteService = new VoteService(storage, streak, party, antiAbuse, online, broadcaster, logger);
@@ -187,37 +198,46 @@ public final class BungeeMCVotePlugin extends Plugin {
             if (!getDataFolder().exists() && !getDataFolder().mkdirs()) {
                 logger.warn("Could not create the data folder");
             }
+
             File file = new File(getDataFolder(), "config.yml");
+
             if (!file.exists()) {
                 try (InputStream in = getResourceAsStream("config.yml")) {
                     Files.copy(in, file.toPath());
                 }
             }
+
             return ConfigurationProvider.getProvider(YamlConfiguration.class).load(file);
         } catch (IOException e) {
             logger.error("Could not load config.yml", e);
+
             return null;
         }
     }
 
     private static Map<String, String> readTokens(Configuration section) {
         Map<String, String> tokens = new LinkedHashMap<>();
+
         if (section != null) {
             for (String service : section.getKeys()) {
                 tokens.put(service, section.getString(service, ""));
             }
         }
+
         return tokens;
     }
 
     private static List<StreakTier> readTiers(Configuration section) {
         List<StreakTier> tiers = new ArrayList<>();
+
         if (section != null) {
             for (String id : section.getKeys()) {
                 tiers.add(new StreakTier(id, section.getInt(id)));
             }
         }
+
         tiers.sort((a, b) -> Integer.compare(a.required(), b.required()));
+
         return tiers;
     }
 

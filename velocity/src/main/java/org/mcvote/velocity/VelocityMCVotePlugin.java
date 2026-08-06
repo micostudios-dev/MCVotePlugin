@@ -57,16 +57,19 @@ public final class VelocityMCVotePlugin {
     @Subscribe
     public void onInit(ProxyInitializeEvent event) {
         VelocityConfig cfg = loadConfig();
+
         if (cfg == null) {
             return;
         }
 
         StorageType type = StorageType.from(cfg.getString("database.type", "sqlite"));
+
         if (type == StorageType.PROXY) {
             logger.error("database.type: proxy is meant for backends. This proxy is the node that owns "
                     + "the state, so use sqlite or mysql here.");
             return;
         }
+
         this.storageLabel = type.name().toLowerCase(Locale.ROOT);
 
         DatabaseConfig database = new DatabaseConfig(
@@ -80,10 +83,12 @@ public final class VelocityMCVotePlugin {
                 cfg.getInt("database.pool-size", 6));
 
         this.storage = StorageFactory.create(database, dataDir.toFile());
+
         try {
             storage.init();
         } catch (Exception e) {
             logger.error("Could not open the vote storage, MCVote will not listen", e);
+
             return;
         }
 
@@ -100,11 +105,14 @@ public final class VelocityMCVotePlugin {
 
     public boolean reload() {
         VelocityConfig cfg = loadConfig();
+
         if (cfg == null) {
             return false;
         }
+
         stopReceiver();
         applyConfig(cfg);
+
         return true;
     }
 
@@ -125,8 +133,10 @@ public final class VelocityMCVotePlugin {
         OnlinePlayers online = () -> {
             List<PlayerRef> refs = new ArrayList<>();
             proxy.getAllPlayers().forEach(p -> refs.add(new PlayerRef(p.getUniqueId(), p.getUsername())));
+
             return refs;
         };
+
         Broadcaster broadcaster = message -> {
             Component component = MiniMessageText.render(message);
             proxy.getAllPlayers().forEach(p -> p.sendMessage(component));
@@ -166,6 +176,7 @@ public final class VelocityMCVotePlugin {
     @Subscribe
     public void onShutdown(ProxyShutdownEvent event) {
         stopReceiver();
+
         if (storage != null) {
             storage.close();
         }
@@ -191,6 +202,7 @@ public final class VelocityMCVotePlugin {
             return VelocityConfig.load(dataDir, getClass().getResourceAsStream("/config.yml"));
         } catch (Exception e) {
             logger.error("Could not load config.yml", e);
+
             return null;
         }
     }
@@ -202,6 +214,7 @@ public final class VelocityMCVotePlugin {
                 tokens.put(service, String.valueOf(value));
             }
         });
+
         return tokens;
     }
 
@@ -212,7 +225,9 @@ public final class VelocityMCVotePlugin {
                 tiers.add(new StreakTier(id, n.intValue()));
             }
         });
+
         tiers.sort((a, b) -> Integer.compare(a.required(), b.required()));
+
         return tiers;
     }
 

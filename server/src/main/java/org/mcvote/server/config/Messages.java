@@ -11,6 +11,7 @@ public record Messages(String prefix, Map<String, String> values, Map<String, Li
 
     public String get(String key) {
         String value = raw(key);
+
         return value.isEmpty() ? "" : prefix + value;
     }
 
@@ -20,9 +21,11 @@ public record Messages(String prefix, Map<String, String> values, Map<String, Li
 
     public static String apply(String text, String... placeholders) {
         String result = text;
+
         for (int i = 0; i + 1 < placeholders.length; i += 2) {
             result = result.replace(placeholders[i], placeholders[i + 1]);
         }
+
         return result;
     }
 }

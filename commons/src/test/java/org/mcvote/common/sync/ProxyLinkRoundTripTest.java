@@ -40,12 +40,15 @@ class ProxyLinkRoundTripTest {
             if (!linkUp) {
                 return false;
             }
+
             proxyThread.execute(() -> {
                 byte[] response = handler.handle(frame);
+
                 if (response != null) {
                     backendStorage.handleResponse(response);
                 }
             });
+
             return true;
         };
 
@@ -174,16 +177,20 @@ class ProxyLinkRoundTripTest {
             queue.removeIf(delivery -> {
                 if (usernames.contains(delivery.username())) {
                     claimed.add(delivery);
+
                     return true;
                 }
+
                 return false;
             });
+
             return claimed;
         }
 
         @Override
         public PartyTick addPartyProgress(int amount, int goal) {
             party += amount;
+
             return new PartyTick(party, 0, 0L);
         }
 

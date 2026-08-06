@@ -59,6 +59,7 @@ final class MCVoteApiImpl implements MCVoteAPI {
 
     int streakOf(String username) {
         PlayerVoteData data = cache.get(username.toLowerCase(Locale.ROOT));
+
         return data == null ? 0 : data.streak();
     }
 

@@ -11,6 +11,7 @@ public record RewardAction(RewardType type, String argument) {
         }
 
         RewardType type = RewardType.fromKeyword(trimmed.substring(0, colon));
+
         return new RewardAction(type, trimmed.substring(colon + 1).trim());
     }
 }

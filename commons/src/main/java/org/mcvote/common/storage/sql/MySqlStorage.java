@@ -69,6 +69,7 @@ public final class MySqlStorage implements VoteStorage {
                      "SELECT username, display_name, uuid, streak, best_streak, total_votes, last_vote_day, last_vote_ms " +
                              "FROM mcvote_players WHERE username = ?")) {
             statement.setString(1, key);
+
             try (ResultSet rs = statement.executeQuery()) {
                 return rs.next() ? read(rs) : null;
             }
@@ -137,6 +138,7 @@ public final class MySqlStorage implements VoteStorage {
                      "SELECT MAX(voted_ms) FROM mcvote_vote_history WHERE username = ? AND service = ?")) {
             statement.setString(1, lower(username));
             statement.setString(2, service == null ? "" : service);
+
             try (ResultSet rs = statement.executeQuery()) {
                 return rs.next() ? rs.getLong(1) : 0L;
             }
@@ -152,6 +154,7 @@ public final class MySqlStorage implements VoteStorage {
                      "SELECT COUNT(*) FROM mcvote_vote_history WHERE username = ? AND voted_ms >= ?")) {
             statement.setString(1, lower(username));
             statement.setLong(2, sinceMs);
+
             try (ResultSet rs = statement.executeQuery()) {
                 return rs.next() ? rs.getInt(1) : 0;
             }
@@ -191,9 +194,11 @@ public final class MySqlStorage implements VoteStorage {
                      "SELECT id, username, type, context, created_ms FROM mcvote_deliveries " +
                              "WHERE claimed = 0 AND username IN " + placeholders)) {
             int index = 1;
+
             for (String username : usernames) {
                 select.setString(index++, lower(username));
             }
+
             try (ResultSet rs = select.executeQuery()) {
                 while (rs.next()) {
                     long id = rs.getLong("id");
@@ -206,12 +211,15 @@ public final class MySqlStorage implements VoteStorage {
             if (!ids.isEmpty()) {
                 StringJoiner idPlaceholders = new StringJoiner(",", "(", ")");
                 ids.forEach(id -> idPlaceholders.add("?"));
+
                 try (PreparedStatement update = connection.prepareStatement(
                         "UPDATE mcvote_deliveries SET claimed = 1 WHERE id IN " + idPlaceholders)) {
                     int i = 1;
+
                     for (long id : ids) {
                         update.setLong(i++, id);
                     }
+
                     update.executeUpdate();
                 }
             }
@@ -226,9 +234,11 @@ public final class MySqlStorage implements VoteStorage {
     public PartyTick addPartyProgress(int amount, int goal) {
         try (Connection connection = dataSource.getConnection()) {
             connection.setAutoCommit(false);
+
             try {
                 int progress = 0;
                 long totalParties = 0;
+
                 try (PreparedStatement select = connection.prepareStatement(
                         "SELECT progress, total_parties FROM mcvote_party WHERE id = 1 FOR UPDATE")) {
                     try (ResultSet rs = select.executeQuery()) {
@@ -252,9 +262,11 @@ public final class MySqlStorage implements VoteStorage {
                 }
 
                 connection.commit();
+
                 return new PartyTick(remainder, triggered, totalParties);
             } catch (SQLException e) {
                 connection.rollback();
+
                 throw e;
             } finally {
                 connection.setAutoCommit(true);
@@ -280,11 +292,13 @@ public final class MySqlStorage implements VoteStorage {
     @Override
     public List<PlayerVoteData> topByVotes(int limit) {
         List<PlayerVoteData> top = new ArrayList<>();
+
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(
                      "SELECT username, display_name, uuid, streak, best_streak, total_votes, last_vote_day, last_vote_ms " +
                              "FROM mcvote_players ORDER BY total_votes DESC LIMIT ?")) {
             statement.setInt(1, Math.max(1, limit));
+
             try (ResultSet rs = statement.executeQuery()) {
                 while (rs.next()) {
                     top.add(read(rs));
@@ -293,6 +307,7 @@ public final class MySqlStorage implements VoteStorage {
         } catch (SQLException e) {
             throw new StorageException("topByVotes", e);
         }
+
         return top;
     }
 

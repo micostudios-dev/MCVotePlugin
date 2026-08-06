@@ -15,16 +15,19 @@ public record StreakConfig(
                 return tier;
             }
         }
+
         return null;
     }
 
     public StreakTier nextTier(int streak) {
         StreakTier best = null;
+
         for (StreakTier tier : tiers) {
             if (tier.required() > streak && (best == null || tier.required() < best.required())) {
                 best = tier;
             }
         }
+
         return best;
     }
 }

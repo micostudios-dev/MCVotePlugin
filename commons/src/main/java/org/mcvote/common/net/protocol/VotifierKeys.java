@@ -41,6 +41,7 @@ public final class VotifierKeys {
             KeyFactory factory = KeyFactory.getInstance(ALGORITHM);
             PublicKey pub = factory.generatePublic(new X509EncodedKeySpec(read(publicFile)));
             PrivateKey priv = factory.generatePrivate(new PKCS8EncodedKeySpec(read(privateFile)));
+
             return new VotifierKeys(new KeyPair(pub, priv), directory, false);
         }
 
@@ -58,6 +59,7 @@ public final class VotifierKeys {
     public String decrypt(byte[] block) throws Exception {
         Cipher cipher = Cipher.getInstance(CIPHER);
         cipher.init(Cipher.DECRYPT_MODE, privateKey);
+
         return new String(cipher.doFinal(block), StandardCharsets.UTF_8);
     }
 
@@ -75,6 +77,7 @@ public final class VotifierKeys {
 
     private static byte[] read(Path file) throws Exception {
         String base64 = Files.readString(file, StandardCharsets.UTF_8).replaceAll("\\s", "");
+
         return Base64.getDecoder().decode(base64);
     }
 

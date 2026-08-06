@@ -44,9 +44,11 @@ public final class RewardExecutor {
     private void giveItem(Player player, String arg) {
         String[] parts = arg.split("\\s+");
         Material material = Material.matchMaterial(parts[0]);
+
         if (material == null) {
             return;
         }
+
         int amount = parts.length > 1 ? parseInt(parts[1], 1) : 1;
         ItemStack stack = new ItemStack(material, Math.max(1, amount));
 
@@ -64,9 +66,11 @@ public final class RewardExecutor {
 
     private String apply(String raw, Player player, Map<String, String> placeholders) {
         String result = raw.replace("%player%", player.getName());
+
         for (Map.Entry<String, String> entry : placeholders.entrySet()) {
             result = result.replace(entry.getKey(), entry.getValue());
         }
+
         return withPlaceholderApi(player, result);
     }
 
@@ -74,6 +78,7 @@ public final class RewardExecutor {
         if (text.indexOf('%') < 0 || Bukkit.getPluginManager().getPlugin("PlaceholderAPI") == null) {
             return text;
         }
+
         try {
             return me.clip.placeholderapi.PlaceholderAPI.setPlaceholders(player, text);
         } catch (Throwable t) {

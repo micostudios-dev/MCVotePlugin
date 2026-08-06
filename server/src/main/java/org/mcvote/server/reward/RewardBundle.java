@@ -11,10 +11,13 @@ public record RewardBundle(List<RewardAction> actions) {
         if (lines == null || lines.isEmpty()) {
             return EMPTY;
         }
+
         List<RewardAction> parsed = new ArrayList<>(lines.size());
+
         for (String line : lines) {
             parsed.add(RewardAction.parse(line));
         }
+
         return new RewardBundle(List.copyOf(parsed));
     }
 

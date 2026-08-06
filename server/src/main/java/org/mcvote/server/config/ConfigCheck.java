@@ -30,17 +30,21 @@ public final class ConfigCheck {
 
         if (!isUtf8(configFile)) {
             logger.error("config.yml is not UTF-8, using bundled defaults. Re-save it as UTF-8 without BOM.");
+
             return;
         }
 
         YamlConfiguration raw = new YamlConfiguration();
+
         try {
             raw.load(configFile);
         } catch (InvalidConfigurationException e) {
             logger.error("config.yml is not valid YAML, using bundled defaults: " + firstLine(e.getMessage()));
+
             return;
         } catch (Exception e) {
             logger.error("Could not read config.yml", e);
+
             return;
         }
 
@@ -52,6 +56,7 @@ public final class ConfigCheck {
         if (problems.isEmpty()) {
             return;
         }
+
         logger.warn("config.yml, using bundled defaults for: " + String.join("; ", problems));
     }
 
@@ -66,11 +71,15 @@ public final class ConfigCheck {
     private static void checkStreakRewards(YamlConfiguration raw, List<String> problems) {
         if (!raw.isSet("rewards.streak")) {
             problems.add("rewards.streak (missing)");
+
             return;
         }
+
         ConfigurationSection rewards = raw.getConfigurationSection("rewards.streak");
+
         if (rewards == null) {
             problems.add("rewards.streak (not a section of tier ids)");
+
             return;
         }
 
@@ -81,15 +90,19 @@ public final class ConfigCheck {
         }
 
         ConfigurationSection tiers = raw.getConfigurationSection("streaks.tiers");
+
         if (tiers == null) {
             return;
         }
+
         Set<String> tierIds = new LinkedHashSet<>(tiers.getKeys(false));
+
         for (String id : rewards.getKeys(false)) {
             if (!tierIds.contains(id)) {
                 problems.add("rewards.streak." + id + " (no such id in streaks.tiers, never fires)");
             }
         }
+
         for (String id : tierIds) {
             if (!rewards.isSet(id)) {
                 problems.add("streaks.tiers." + id + " (no rewards.streak." + id + ")");
@@ -103,6 +116,7 @@ public final class ConfigCheck {
                 .onUnmappableCharacter(CodingErrorAction.REPORT);
         try {
             decoder.decode(ByteBuffer.wrap(Files.readAllBytes(file.toPath())));
+
             return true;
         } catch (CharacterCodingException e) {
             return false;
@@ -115,7 +129,9 @@ public final class ConfigCheck {
         if (message == null) {
             return "unknown error";
         }
+
         int newline = message.indexOf('\n');
+
         return newline < 0 ? message : message.substring(0, newline);
     }
 }

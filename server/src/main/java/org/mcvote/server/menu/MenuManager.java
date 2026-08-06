@@ -25,6 +25,7 @@ public final class MenuManager implements Listener {
         }
 
         MenuButton button = menuHolder.menu().button(event.getRawSlot());
+
         if (button != null) {
             button.click(player);
         }

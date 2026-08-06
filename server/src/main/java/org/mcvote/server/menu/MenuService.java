@@ -35,11 +35,14 @@ public final class MenuService {
     public void load(FileConfiguration cfg) {
         layouts.clear();
         ConfigurationSection root = cfg.getConfigurationSection("menus");
+
         if (root == null) {
             return;
         }
+
         for (String id : root.getKeys(false)) {
             ConfigurationSection section = root.getConfigurationSection(id);
+
             if (section != null) {
                 layouts.put(id.toLowerCase(Locale.ROOT), parseLayout(section));
             }
@@ -48,11 +51,13 @@ public final class MenuService {
 
     public boolean isEnabled(String id) {
         MenuLayout layout = layouts.get(id.toLowerCase(Locale.ROOT));
+
         return layout != null && layout.enabled();
     }
 
     public boolean open(String id, Player player) {
         MenuLayout layout = layouts.get(id.toLowerCase(Locale.ROOT));
+
         if (layout == null || !layout.enabled()) {
             return false;
         }
@@ -63,6 +68,7 @@ public final class MenuService {
             int party = server.storage().partyProgress();
             server.scheduler().runForPlayer(player, () -> build(layout, player, data, party).open(player));
         });
+
         return true;
     }
 
@@ -74,6 +80,7 @@ public final class MenuService {
             if (icon.permission() != null && !icon.permission().isEmpty() && !player.hasPermission(icon.permission())) {
                 continue;
             }
+
             menu.set(icon.slot(), new MenuButton(
                     Items.of(material(icon.material()), apply(icon.name(), base), applyAll(icon.lore(), base), server.messages()),
                     p -> runActions(p, icon.actions())));
@@ -81,6 +88,7 @@ public final class MenuService {
 
         fillLinks(menu, layout.links(), base);
         fillTiers(menu, layout.tiers(), base, data == null ? 0 : data.streak());
+
         return menu;
     }
 
@@ -88,7 +96,9 @@ public final class MenuService {
         if (links == null || !links.enabled()) {
             return;
         }
+
         int slot = links.startSlot();
+
         for (String link : server.config().voteLinks()) {
             String[] parts = link.split("\\|", 2);
             Map<String, String> ph = new HashMap<>(base);
@@ -110,7 +120,9 @@ public final class MenuService {
         if (tiers == null || !tiers.enabled()) {
             return;
         }
+
         int slot = tiers.startSlot();
+
         for (StreakTier tier : server.config().streak().tiers()) {
             boolean reached = streak >= tier.required();
             int remaining = Math.max(0, tier.required() - streak);
@@ -130,6 +142,7 @@ public final class MenuService {
     private void runActions(Player player, List<MenuAction> actions) {
         for (MenuAction action : actions) {
             String arg = action.argument().replace("%player%", player.getName());
+
             switch (action.type()) {
                 case OPEN -> open(arg, player);
                 case CONSOLE -> server.scheduler().runGlobal(
@@ -163,6 +176,7 @@ public final class MenuService {
 
     private void notify(Player player, String key) {
         String message = server.config().messages().get(key);
+
         if (!message.isEmpty()) {
             server.messages().send(player, message);
         }
@@ -174,6 +188,7 @@ public final class MenuService {
             Bukkit.getOnlinePlayers().forEach(p ->
                     server.storage().enqueue(p.getName().toLowerCase(Locale.ROOT), DeliveryType.PARTY, "", now));
             String broadcast = server.config().party().broadcastMessage();
+
             if (broadcast != null && !broadcast.isBlank()) {
                 server.messages().broadcast(broadcast);
             }
@@ -196,6 +211,7 @@ public final class MenuService {
         map.put("%next_tier%", next == null ? "-" : next.id());
         map.put("%next_tier_required%", String.valueOf(next == null ? 0 : next.required()));
         map.put("%next_tier_in%", String.valueOf(next == null ? 0 : Math.max(0, next.required() - streak)));
+
         return map;
     }
 
@@ -203,10 +219,13 @@ public final class MenuService {
         if (raw == null) {
             return "";
         }
+
         String result = raw;
+
         for (Map.Entry<String, String> entry : placeholders.entrySet()) {
             result = result.replace(entry.getKey(), entry.getValue());
         }
+
         return result;
     }
 
@@ -214,10 +233,13 @@ public final class MenuService {
         if (lines == null) {
             return List.of();
         }
+
         List<String> out = new ArrayList<>(lines.size());
+
         for (String line : lines) {
             out.add(apply(line, placeholders));
         }
+
         return out;
     }
 
@@ -232,16 +254,21 @@ public final class MenuService {
 
         List<MenuIcon> icons = new ArrayList<>();
         ConfigurationSection items = section.getConfigurationSection("items");
+
         if (items != null) {
             for (String key : items.getKeys(false)) {
                 ConfigurationSection item = items.getConfigurationSection(key);
+
                 if (item == null) {
                     continue;
                 }
+
                 List<MenuAction> actions = new ArrayList<>();
+
                 for (String line : item.getStringList("actions")) {
                     actions.add(MenuAction.parse(line));
                 }
+
                 icons.add(new MenuIcon(
                         item.getInt("slot", 0),
                         item.getString("material", "PAPER"),
@@ -260,6 +287,7 @@ public final class MenuService {
         if (section == null) {
             return null;
         }
+
         return new LinksFill(
                 section.getBoolean("enabled", true),
                 section.getInt("start-slot", 0),
@@ -273,6 +301,7 @@ public final class MenuService {
         if (section == null) {
             return null;
         }
+
         return new TiersFill(
                 section.getBoolean("enabled", true),
                 section.getInt("start-slot", 0),

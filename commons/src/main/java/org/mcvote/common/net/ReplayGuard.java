@@ -25,6 +25,7 @@ public final class ReplayGuard {
         seen.values().removeIf(expiry -> expiry <= now);
 
         String key = fingerprint(block);
+
         if (seen.containsKey(key)) {
             return false;
         }
@@ -34,12 +35,14 @@ public final class ReplayGuard {
         }
 
         seen.put(key, now + windowMs);
+
         return true;
     }
 
     private static String fingerprint(byte[] block) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
+
             return Base64.getEncoder().encodeToString(digest.digest(block));
         } catch (Exception e) {
             throw new IllegalStateException("SHA-256 unavailable", e);

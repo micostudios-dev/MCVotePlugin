@@ -51,6 +51,7 @@ public final class RemoteVoteStorage implements VoteStorage {
             long id = json.get("id").getAsLong();
 
             CompletableFuture<JsonElement> future = pending.remove(id);
+
             if (future == null) {
                 return;
             }
@@ -70,6 +71,7 @@ public final class RemoteVoteStorage implements VoteStorage {
     public PlayerVoteData load(String username) {
         JsonObject args = new JsonObject();
         args.addProperty("username", username);
+
         return SyncCodec.readPlayer(call(SyncProtocol.OP_LOAD, args));
     }
 
@@ -79,6 +81,7 @@ public final class RemoteVoteStorage implements VoteStorage {
         args.addProperty("username", username);
         args.addProperty("service", service);
         JsonElement result = call(SyncProtocol.OP_LAST_SERVICE_VOTE, args);
+
         return result == null || result.isJsonNull() ? 0L : result.getAsLong();
     }
 
@@ -88,6 +91,7 @@ public final class RemoteVoteStorage implements VoteStorage {
         args.addProperty("username", username);
         args.addProperty("sinceMs", sinceMs);
         JsonElement result = call(SyncProtocol.OP_COUNT_VOTES_SINCE, args);
+
         return result == null || result.isJsonNull() ? 0 : result.getAsInt();
     }
 
@@ -96,8 +100,10 @@ public final class RemoteVoteStorage implements VoteStorage {
         if (usernames.isEmpty()) {
             return List.of();
         }
+
         JsonObject args = new JsonObject();
         args.add("usernames", SyncCodec.writeStrings(usernames));
+
         return SyncCodec.readDeliveries(call(SyncProtocol.OP_CLAIM, args));
     }
 
@@ -107,12 +113,14 @@ public final class RemoteVoteStorage implements VoteStorage {
         args.addProperty("amount", amount);
         args.addProperty("goal", goal);
         JsonElement result = call(SyncProtocol.OP_ADD_PARTY, args);
+
         return result == null || result.isJsonNull() ? new PartyTick(0, 0, 0L) : SyncCodec.readPartyTick(result);
     }
 
     @Override
     public int partyProgress() {
         JsonElement result = call(SyncProtocol.OP_PARTY_PROGRESS, new JsonObject());
+
         return result == null || result.isJsonNull() ? 0 : result.getAsInt();
     }
 
@@ -120,6 +128,7 @@ public final class RemoteVoteStorage implements VoteStorage {
     public List<PlayerVoteData> topByVotes(int limit) {
         JsonObject args = new JsonObject();
         args.addProperty("limit", limit);
+
         return SyncCodec.readPlayers(call(SyncProtocol.OP_TOP, args));
     }
 
@@ -166,6 +175,7 @@ public final class RemoteVoteStorage implements VoteStorage {
         if (!link.send(frame(id, op, args, true))) {
             pending.remove(id);
             warn("no player online to reach the proxy through");
+
             return null;
         }
 
@@ -174,6 +184,7 @@ public final class RemoteVoteStorage implements VoteStorage {
         } catch (Exception e) {
             pending.remove(id);
             warn("the proxy did not answer '" + op + "' in " + SyncProtocol.TIMEOUT_MS + "ms");
+
             return null;
         }
     }
@@ -189,17 +200,21 @@ public final class RemoteVoteStorage implements VoteStorage {
         json.addProperty("id", id);
         json.addProperty("op", op);
         json.add("args", args);
+
         if (ack) {
             json.addProperty("ack", true);
         }
+
         return json.toString().getBytes(StandardCharsets.UTF_8);
     }
 
     private void warn(String reason) {
         long now = System.currentTimeMillis();
+
         if (now - lastWarnMs < WARN_INTERVAL_MS) {
             return;
         }
+
         lastWarnMs = now;
         logger.warn("Proxy link unavailable (" + reason + "). Rewards stay queued on the proxy.");
     }

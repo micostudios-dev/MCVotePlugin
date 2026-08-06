@@ -60,9 +60,11 @@ public final class DeliveryService {
 
     private void poll() {
         Map<String, Player> byName = new HashMap<>();
+
         for (Player player : Bukkit.getOnlinePlayers()) {
             byName.put(player.getName().toLowerCase(Locale.ROOT), player);
         }
+
         if (byName.isEmpty()) {
             return;
         }
@@ -75,19 +77,23 @@ public final class DeliveryService {
 
     private void dispatch(List<PendingDelivery> deliveries) {
         Map<String, Player> byName = new HashMap<>();
+
         for (Player player : Bukkit.getOnlinePlayers()) {
             byName.put(player.getName().toLowerCase(Locale.ROOT), player);
         }
+
         dispatchTo(deliveries, byName);
     }
 
     private void dispatchTo(List<PendingDelivery> deliveries, Map<String, Player> byName) {
         for (PendingDelivery delivery : deliveries) {
             Player player = byName.get(delivery.username());
+
             if (player == null) {
                 storage.enqueue(delivery.username(), delivery.type(), delivery.context(), delivery.createdMs());
                 continue;
             }
+
             execute(player, delivery);
         }
     }
@@ -107,6 +113,7 @@ public final class DeliveryService {
             case STREAK -> config.messages().get("streak-milestone");
             case PARTY -> config.messages().get("party-reward");
         };
+
         if (!message.isEmpty()) {
             messages.send(player, applyAll(message, player.getName(), placeholders));
         }
@@ -130,14 +137,17 @@ public final class DeliveryService {
         map.put("%next_tier%", next == null ? "-" : next.id());
         map.put("%next_tier_required%", String.valueOf(next == null ? 0 : next.required()));
         map.put("%next_tier_in%", String.valueOf(next == null ? 0 : Math.max(0, next.required() - streak)));
+
         return map;
     }
 
     private static String applyAll(String raw, String playerName, Map<String, String> placeholders) {
         String result = raw.replace("%player%", playerName);
+
         for (Map.Entry<String, String> entry : placeholders.entrySet()) {
             result = result.replace(entry.getKey(), entry.getValue());
         }
+
         return result;
     }
 }

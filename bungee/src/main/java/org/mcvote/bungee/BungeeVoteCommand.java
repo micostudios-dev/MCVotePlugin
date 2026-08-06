@@ -39,8 +39,10 @@ public final class BungeeVoteCommand extends Command {
 
     private void info(Audience audience) {
         VoteReceiver receiver = plugin.receiver();
+
         if (receiver == null) {
             send(audience, "<red>The vote receiver is not running. Check the console.");
+
             return;
         }
 
@@ -54,6 +56,7 @@ public final class BungeeVoteCommand extends Command {
 
     static String copyable(String value) {
         String safe = MiniMessageText.escape(value);
+
         return "<click:copy_to_clipboard:'" + safe + "'>"
                 + "<hover:show_text:'<gray>Click to copy'><white>" + safe + "</white></hover></click>";
     }

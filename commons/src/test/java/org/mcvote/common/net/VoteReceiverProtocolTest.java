@@ -55,6 +55,7 @@ class VoteReceiverProtocolTest {
     private int start(ReceiverConfig config) throws Exception {
         receiver = new VoteReceiver(config, dataFolder, votes::add, new SilentLogger());
         receiver.start();
+
         return receiver.boundPort();
     }
 
@@ -72,6 +73,7 @@ class VoteReceiverProtocolTest {
 
         long before = System.currentTimeMillis();
         JsonObject reply;
+
         try (Socket socket = new Socket("127.0.0.1", port)) {
             String challenge = greeting(socket);
             reply = sendV2(socket, payload("MinecraftMP", "Notch", "1.2.3.4", challenge, 1L), TOKEN);
@@ -156,6 +158,7 @@ class VoteReceiverProtocolTest {
         byte[] block = v1Block("VOTE\nTopG\nJeb_\n5.6.7.8\n1\n");
 
         long before = System.currentTimeMillis();
+
         try (Socket socket = new Socket("127.0.0.1", port)) {
             greeting(socket);
             socket.getOutputStream().write(block);
@@ -223,6 +226,7 @@ class VoteReceiverProtocolTest {
         String[] fields = line.trim().split(" ");
         assertEquals("VOTIFIER", fields[0]);
         assertEquals("2", fields[1]);
+
         return fields[2];
     }
 
@@ -233,6 +237,7 @@ class VoteReceiverProtocolTest {
         body.addProperty("address", address);
         body.addProperty("timestamp", timestamp);
         body.addProperty("challenge", challenge);
+
         return body.toString();
     }
 
@@ -240,6 +245,7 @@ class VoteReceiverProtocolTest {
         JsonObject envelope = new JsonObject();
         envelope.addProperty("payload", payload);
         envelope.addProperty("signature", VoteSignature.sign(payload, token));
+
         return sendFrame(socket, VotifierProtocol.V2_MAGIC_1, VotifierProtocol.V2_MAGIC_2, envelope.toString());
     }
 
@@ -256,6 +262,7 @@ class VoteReceiverProtocolTest {
                 new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
         String line = reader.readLine();
         assertNotNull(line, "the receiver sent no reply");
+
         return JsonParser.parseString(line).getAsJsonObject();
     }
 
@@ -266,6 +273,7 @@ class VoteReceiverProtocolTest {
 
         Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
         cipher.init(Cipher.ENCRYPT_MODE, key);
+
         return cipher.doFinal(contents.getBytes(StandardCharsets.UTF_8));
     }
 

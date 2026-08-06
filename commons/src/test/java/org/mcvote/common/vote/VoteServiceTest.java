@@ -119,22 +119,26 @@ class VoteServiceTest {
         @Override
         public long lastServiceVoteMs(String username, String service) {
             long max = 0L;
+
             for (Row row : history) {
                 if (row.username.equals(username) && row.service.equals(service)) {
                     max = Math.max(max, row.votedMs);
                 }
             }
+
             return max;
         }
 
         @Override
         public int countVotesSince(String username, long sinceMs) {
             int count = 0;
+
             for (Row row : history) {
                 if (row.username.equals(username) && row.votedMs >= sinceMs) {
                     count++;
                 }
             }
+
             return count;
         }
 

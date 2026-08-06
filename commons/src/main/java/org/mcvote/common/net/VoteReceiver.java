@@ -54,21 +54,26 @@ public final class VoteReceiver {
         this.workers = new ThreadPoolExecutor(0, 8, 30, TimeUnit.SECONDS, new SynchronousQueue<>(), r -> {
             Thread t = new Thread(r, "MCVote-VoteWorker");
             t.setDaemon(true);
+
             return t;
         }, new ThreadPoolExecutor.CallerRunsPolicy());
     }
 
     public void start() throws Exception {
         this.keys = VotifierKeys.loadOrCreate(dataFolder);
+
         if (keys.generated()) {
             logger.info("Generated a new Votifier RSA key pair in " + keys.directory());
         }
+
         logger.info("Votifier v1 public key (paste this on the listing site): " + keys.publicKeyBase64());
 
         this.token = VotifierToken.loadOrCreate(dataFolder);
+
         if (token.generated()) {
             logger.info("Generated a Votifier token in " + token.file());
         }
+
         logger.info("Votifier token (paste this on the listing site): " + defaultToken());
 
         ServerSocket socket = new ServerSocket();
@@ -91,6 +96,7 @@ public final class VoteReceiver {
         running = false;
 
         ServerSocket socket = serverSocket;
+
         if (socket != null) {
             try {
                 socket.close();
@@ -103,20 +109,25 @@ public final class VoteReceiver {
 
     public String defaultToken() {
         String configured = config.tokenFor(VotifierProtocol.DEFAULT_TOKEN);
+
         if (!configured.isEmpty()) {
             return configured;
         }
+
         VotifierToken generated = token;
+
         return generated == null ? "" : generated.value();
     }
 
     public String publicKey() {
         VotifierKeys current = keys;
+
         return current == null ? "" : current.publicKeyBase64();
     }
 
     public int boundPort() {
         ServerSocket socket = serverSocket;
+
         return socket == null ? config.port() : socket.getLocalPort();
     }
 
@@ -149,6 +160,7 @@ public final class VoteReceiver {
             int second = in.readUnsignedByte();
 
             Vote vote;
+
             if (first == VotifierProtocol.V2_MAGIC_1 && second == VotifierProtocol.V2_MAGIC_2) {
                 vote = readVotifierV2(in, out, challenge);
             } else if (first == MCVoteProtocol.MAGIC_1 && second == MCVoteProtocol.MAGIC_2) {
@@ -167,8 +179,10 @@ public final class VoteReceiver {
 
     private Vote readVotifierV2(DataInputStream in, OutputStream out, String challenge) throws Exception {
         int length = in.readUnsignedShort();
+
         if (length <= 0 || length > VotifierProtocol.MAX_V2_FRAME) {
             respondV2(out, "bad length", "Frame length " + length + " is out of range");
+
             return null;
         }
 
@@ -183,31 +197,39 @@ public final class VoteReceiver {
         String service = string(body, "serviceName");
 
         String expected = config.tokenFor(service);
+
         if (expected.isEmpty()) {
             expected = defaultToken();
         }
+
         if (expected.isEmpty()) {
             respondV2(out, "no token", "No token configured for service " + service);
+
             return null;
         }
 
         if (!VoteSignature.verify(payload, expected, signature)) {
             respondV2(out, "invalid signature", "Signature does not match the token for " + service);
+
             return null;
         }
 
         if (!VoteSignature.constantTimeEquals(challenge, string(body, "challenge"))) {
             respondV2(out, "challenge mismatch", "Challenge does not match the one sent in the greeting");
+
             return null;
         }
 
         String username = string(body, "username");
+
         if (username.isBlank()) {
             respondV2(out, "missing username", "The payload carries no username");
+
             return null;
         }
 
         respondV2(out, null, null);
+
         return vote(service, username, string(body, "address"));
     }
 
@@ -219,26 +241,33 @@ public final class VoteReceiver {
 
         if (!replayGuard.accept(block)) {
             logger.warn("Rejected a Votifier v1 block: replay of one already received");
+
             return null;
         }
 
         String decrypted;
+
         try {
             decrypted = keys.decrypt(block);
         } catch (Exception e) {
             logger.warn("Rejected a Votifier v1 block: it is not encrypted with our public key");
+
             return null;
         }
 
         String[] lines = decrypted.split("\n");
+
         if (lines.length < 3 || !VotifierProtocol.V1_OPCODE.equals(lines[0].trim())) {
             logger.warn("Rejected a Votifier v1 block: bad opcode");
+
             return null;
         }
 
         String username = lines[2].trim();
+
         if (username.isBlank()) {
             logger.warn("Rejected a Votifier v1 block: no username");
+
             return null;
         }
 
@@ -247,13 +276,16 @@ public final class VoteReceiver {
 
     private Vote readLegacyMcVote(DataInputStream in, OutputStream out, String challenge) throws Exception {
         int length = in.readUnsignedShort();
+
         if (length <= 0 || length > MCVoteProtocol.MAX_FRAME) {
             respondLegacy(out, "error", "bad length");
+
             return null;
         }
 
         if (config.apiKey().isEmpty()) {
             respondLegacy(out, "error", "no api key configured");
+
             return null;
         }
 
@@ -266,6 +298,7 @@ public final class VoteReceiver {
 
         if (!VoteSignature.verify(payload, config.apiKey(), signature)) {
             respondLegacy(out, "error", "invalid signature");
+
             return null;
         }
 
@@ -273,17 +306,21 @@ public final class VoteReceiver {
 
         if (!VoteSignature.constantTimeEquals(challenge, string(body, "challenge"))) {
             respondLegacy(out, "error", "challenge mismatch");
+
             return null;
         }
 
         String username = string(body, "username");
+
         if (username.isBlank()) {
             respondLegacy(out, "error", "missing username");
+
             return null;
         }
 
         String service = body.has("service") ? string(body, "service") : "MCVote";
         respondLegacy(out, "ok", null);
+
         return vote(service, username, string(body, "address"));
     }
 
@@ -297,6 +334,7 @@ public final class VoteReceiver {
 
     private static void respondV2(OutputStream out, String cause, String error) throws Exception {
         JsonObject response = new JsonObject();
+
         if (cause == null) {
             response.addProperty("status", "ok");
         } else {
@@ -304,6 +342,7 @@ public final class VoteReceiver {
             response.addProperty("cause", cause);
             response.addProperty("error", error);
         }
+
         out.write((response + "\r\n").getBytes(StandardCharsets.UTF_8));
         out.flush();
     }
@@ -311,9 +350,11 @@ public final class VoteReceiver {
     private static void respondLegacy(OutputStream out, String status, String cause) throws Exception {
         JsonObject response = new JsonObject();
         response.addProperty("status", status);
+
         if (cause != null) {
             response.addProperty("cause", cause);
         }
+
         out.write((response + "\n").getBytes(StandardCharsets.UTF_8));
         out.flush();
     }
@@ -321,6 +362,7 @@ public final class VoteReceiver {
     private static String newChallenge() {
         byte[] bytes = new byte[16];
         RANDOM.nextBytes(bytes);
+
         return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
     }
 }

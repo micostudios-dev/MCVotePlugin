@@ -28,10 +28,12 @@ public final class BungeeSyncListener implements Listener {
 
         if (!(event.getSender() instanceof Server sender)) {
             logger.warn("Dropped a " + SyncProtocol.CHANNEL + " frame that did not come from a backend server");
+
             return;
         }
 
         byte[] response = handler.handle(event.getData());
+
         if (response != null) {
             sender.sendData(SyncProtocol.CHANNEL, response);
         }

@@ -73,11 +73,13 @@ public final class MCVoteServer {
         this.config = ServerConfig.load(plugin.getConfig(), loadMessages());
 
         this.storage = createStorage();
+
         try {
             storage.init();
         } catch (Exception e) {
             logger.error("Could not open the vote storage, disabling MCVote", e);
             Bukkit.getPluginManager().disablePlugin(plugin);
+
             return;
         }
 
@@ -111,16 +113,21 @@ public final class MCVoteServer {
         if (receiver != null) {
             receiver.stop();
         }
+
         if (delivery != null) {
             delivery.stop();
         }
+
         if (proxyLink != null) {
             proxyLink.unregister();
         }
+
         scheduler.shutdown();
+
         if (storage != null) {
             storage.close();
         }
+
         MCVoteProvider.set(null);
     }
 
@@ -134,6 +141,7 @@ public final class MCVoteServer {
             receiver.stop();
             receiver = null;
         }
+
         if (delivery != null) {
             delivery.stop();
         }
@@ -143,9 +151,11 @@ public final class MCVoteServer {
         MCVoteProvider.set(api);
         this.delivery = new DeliveryService(storage, config, rewardExecutor, messages, scheduler, dataCache);
         delivery.start();
+
         if (menuService != null) {
             loadMenus();
         }
+
         startReceiver();
     }
 
@@ -153,6 +163,7 @@ public final class MCVoteServer {
         for (String resource : LANG_RESOURCES) {
             saveResourceIfMissing(resource);
         }
+
         for (String resource : MENU_RESOURCES) {
             saveResourceIfMissing(resource);
         }
@@ -167,9 +178,11 @@ public final class MCVoteServer {
     private Messages loadMessages() {
         String language = plugin.getConfig().getString("language", DEFAULT_LANGUAGE);
         File file = new File(plugin.getDataFolder(), "lang/" + language + ".yml");
+
         if (!file.exists()) {
             file = new File(plugin.getDataFolder(), "lang/" + DEFAULT_LANGUAGE + ".yml");
         }
+
         return ServerConfig.messagesFrom(YamlConfiguration.loadConfiguration(file));
     }
 
@@ -179,8 +192,10 @@ public final class MCVoteServer {
 
         File dir = new File(plugin.getDataFolder(), "menu");
         File[] files = dir.listFiles((d, name) -> name.toLowerCase(Locale.ROOT).endsWith(".yml"));
+
         if (files != null) {
             Arrays.sort(files);
+
             for (File file : files) {
                 ConfigurationSection section = YamlConfiguration.loadConfiguration(file)
                         .getConfigurationSection("menus");
@@ -191,6 +206,7 @@ public final class MCVoteServer {
                 }
             }
         }
+
         menuService.load(combined);
     }
 
@@ -198,6 +214,7 @@ public final class MCVoteServer {
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") == null) {
             return;
         }
+
         try {
             new MCVotePlaceholders(dataCache, config, plugin.getDescription().getVersion()).register();
             logger.info("Hooked into PlaceholderAPI");
@@ -214,6 +231,7 @@ public final class MCVoteServer {
         this.proxyLink = new BukkitProxyLink(plugin, scheduler);
         RemoteVoteStorage remote = new RemoteVoteStorage(proxyLink, logger);
         proxyLink.register(remote);
+
         return remote;
     }
 
@@ -225,8 +243,10 @@ public final class MCVoteServer {
         OnlinePlayers online = () -> {
             List<PlayerRef> refs = new ArrayList<>();
             Bukkit.getOnlinePlayers().forEach(p -> refs.add(new PlayerRef(p.getUniqueId(), p.getName())));
+
             return refs;
         };
+
         Broadcaster broadcaster = messages::broadcast;
 
         VoteService voteService = new VoteService(storage, config.streak(), config.party(),
@@ -238,6 +258,7 @@ public final class MCVoteServer {
                 vote -> {
                     try {
                         VoteProcessResult result = voteService.process(vote);
+
                         if (result.accepted()) {
                             api.fire(vote);
                         }
@@ -256,6 +277,7 @@ public final class MCVoteServer {
 
     private void register(String name, org.bukkit.command.CommandExecutor executor) {
         var command = plugin.getCommand(name);
+
         if (command != null) {
             command.setExecutor(executor);
         }

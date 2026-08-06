@@ -21,6 +21,7 @@ final class SyncCodec {
         if (data == null) {
             return JsonNull.INSTANCE;
         }
+
         JsonObject json = new JsonObject();
         json.addProperty("username", data.username());
         json.addProperty("displayName", data.displayName());
@@ -30,6 +31,7 @@ final class SyncCodec {
         json.addProperty("totalVotes", data.totalVotes());
         json.addProperty("lastVoteDay", data.lastVoteDay());
         json.addProperty("lastVoteMs", data.lastVoteMs());
+
         return json;
     }
 
@@ -37,7 +39,9 @@ final class SyncCodec {
         if (element == null || element.isJsonNull()) {
             return null;
         }
+
         JsonObject json = element.getAsJsonObject();
+
         return new PlayerVoteData(
                 string(json, "username"),
                 string(json, "displayName"),
@@ -56,11 +60,13 @@ final class SyncCodec {
         json.addProperty("type", delivery.type().name());
         json.addProperty("context", delivery.context());
         json.addProperty("createdMs", delivery.createdMs());
+
         return json;
     }
 
     static PendingDelivery readDelivery(JsonElement element) {
         JsonObject json = element.getAsJsonObject();
+
         return new PendingDelivery(
                 json.get("id").getAsLong(),
                 string(json, "username"),
@@ -74,11 +80,13 @@ final class SyncCodec {
         json.addProperty("progress", tick.progress());
         json.addProperty("triggered", tick.triggered());
         json.addProperty("totalParties", tick.totalParties());
+
         return json;
     }
 
     static PartyTick readPartyTick(JsonElement element) {
         JsonObject json = element.getAsJsonObject();
+
         return new PartyTick(
                 json.get("progress").getAsInt(),
                 json.get("triggered").getAsInt(),
@@ -88,42 +96,51 @@ final class SyncCodec {
     static JsonArray writeDeliveries(List<PendingDelivery> deliveries) {
         JsonArray array = new JsonArray();
         deliveries.forEach(delivery -> array.add(write(delivery)));
+
         return array;
     }
 
     static List<PendingDelivery> readDeliveries(JsonElement element) {
         List<PendingDelivery> deliveries = new ArrayList<>();
+
         if (element != null && element.isJsonArray()) {
             element.getAsJsonArray().forEach(item -> deliveries.add(readDelivery(item)));
         }
+
         return deliveries;
     }
 
     static JsonArray writePlayers(List<PlayerVoteData> players) {
         JsonArray array = new JsonArray();
         players.forEach(player -> array.add(write(player)));
+
         return array;
     }
 
     static List<PlayerVoteData> readPlayers(JsonElement element) {
         List<PlayerVoteData> players = new ArrayList<>();
+
         if (element != null && element.isJsonArray()) {
             element.getAsJsonArray().forEach(item -> players.add(readPlayer(item)));
         }
+
         return players;
     }
 
     static JsonArray writeStrings(Iterable<String> values) {
         JsonArray array = new JsonArray();
         values.forEach(array::add);
+
         return array;
     }
 
     static List<String> readStrings(JsonElement element) {
         List<String> values = new ArrayList<>();
+
         if (element != null && element.isJsonArray()) {
             element.getAsJsonArray().forEach(item -> values.add(item.getAsString()));
         }
+
         return values;
     }
 

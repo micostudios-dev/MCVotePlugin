@@ -31,6 +31,7 @@ public final class VoteCommand implements CommandExecutor {
             if (!(sender instanceof Player player) || !server.menus().open("main", player)) {
                 links(sender);
             }
+
             return true;
         }
 
@@ -45,17 +46,21 @@ public final class VoteCommand implements CommandExecutor {
             case "test" -> test(sender, args);
             default -> help(sender);
         }
+
         return true;
     }
 
     private void streak(CommandSender sender) {
         if (!(sender instanceof Player player)) {
             send(sender, "players-only");
+
             return;
         }
+
         if (server.menus().open("streak", player)) {
             return;
         }
+
         streakChat(player);
     }
 
@@ -74,12 +79,16 @@ public final class VoteCommand implements CommandExecutor {
     private void admin(CommandSender sender) {
         if (!sender.hasPermission(ADMIN_PERMISSION)) {
             deny(sender);
+
             return;
         }
+
         if (!(sender instanceof Player player)) {
             send(sender, "admin-console");
+
             return;
         }
+
         if (!server.menus().open("admin", player)) {
             send(player, "admin-menu-disabled");
         }
@@ -88,8 +97,10 @@ public final class VoteCommand implements CommandExecutor {
     private void party(CommandSender sender) {
         if (!server.config().party().enabled()) {
             send(sender, "party-disabled");
+
             return;
         }
+
         server.scheduler().runAsync(() -> {
             int goal = server.config().party().goal();
             int progress = server.storage().partyProgress();
@@ -103,12 +114,16 @@ public final class VoteCommand implements CommandExecutor {
     private void top(CommandSender sender) {
         server.scheduler().runAsync(() -> {
             List<PlayerVoteData> top = server.storage().topByVotes(TOP_SIZE);
+
             if (top.isEmpty()) {
                 send(sender, "top-empty");
+
                 return;
             }
+
             send(sender, "top-header");
             int rank = 1;
+
             for (PlayerVoteData data : top) {
                 String name = data.displayName() != null ? data.displayName() : data.username();
                 line(sender, "top-entry",
@@ -121,11 +136,15 @@ public final class VoteCommand implements CommandExecutor {
 
     private void links(CommandSender sender) {
         List<String> links = server.config().voteLinks();
+
         if (links.isEmpty()) {
             send(sender, "links-empty");
+
             return;
         }
+
         send(sender, "links-header");
+
         for (String link : links) {
             String[] parts = link.split("\\|", 2);
             String name = parts.length > 1 ? parts[0] : link;
@@ -140,8 +159,10 @@ public final class VoteCommand implements CommandExecutor {
     private void reload(CommandSender sender) {
         if (!sender.hasPermission(ADMIN_PERMISSION)) {
             deny(sender);
+
             return;
         }
+
         server.reload();
         send(sender, "reloaded");
     }
@@ -149,16 +170,20 @@ public final class VoteCommand implements CommandExecutor {
     private void forceParty(CommandSender sender) {
         if (!sender.hasPermission(ADMIN_PERMISSION)) {
             deny(sender);
+
             return;
         }
+
         server.scheduler().runAsync(() -> {
             long now = System.currentTimeMillis();
             Bukkit.getOnlinePlayers().forEach(p ->
                     server.storage().enqueue(p.getName().toLowerCase(Locale.ROOT), DeliveryType.PARTY, "", now));
             String broadcast = server.config().party().broadcastMessage();
+
             if (broadcast != null && !broadcast.isBlank()) {
                 server.messages().broadcast(broadcast);
             }
+
             send(sender, "party-forced");
         });
     }
@@ -166,12 +191,16 @@ public final class VoteCommand implements CommandExecutor {
     private void test(CommandSender sender, String[] args) {
         if (!sender.hasPermission(ADMIN_PERMISSION)) {
             deny(sender);
+
             return;
         }
+
         if (args.length < 2) {
             send(sender, "test-usage");
+
             return;
         }
+
         String target = args[1].toLowerCase(Locale.ROOT);
         server.scheduler().runAsync(() -> {
             server.storage().enqueue(target, DeliveryType.VOTE, "MCVoteTest", System.currentTimeMillis());
@@ -181,6 +210,7 @@ public final class VoteCommand implements CommandExecutor {
 
     private void help(CommandSender sender) {
         block(sender, "help");
+
         if (sender.hasPermission(ADMIN_PERMISSION)) {
             block(sender, "help-admin");
         }
@@ -192,6 +222,7 @@ public final class VoteCommand implements CommandExecutor {
 
     private void send(CommandSender sender, String key, String... placeholders) {
         String message = server.config().messages().get(key);
+
         if (!message.isEmpty()) {
             server.messages().send(sender, Messages.apply(message, placeholders));
         }
@@ -199,6 +230,7 @@ public final class VoteCommand implements CommandExecutor {
 
     private void line(CommandSender sender, String key, String... placeholders) {
         String message = server.config().messages().raw(key);
+
         if (!message.isEmpty()) {
             server.messages().send(sender, Messages.apply(message, placeholders));
         }

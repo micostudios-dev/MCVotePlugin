@@ -23,6 +23,7 @@ public final class SyncRequestHandler {
 
     public byte[] handle(byte[] frame) {
         long id = 0L;
+
         try {
             JsonObject request = JsonParser.parseString(new String(frame, StandardCharsets.UTF_8)).getAsJsonObject();
             id = request.get("id").getAsLong();
@@ -31,6 +32,7 @@ public final class SyncRequestHandler {
             boolean ack = request.has("ack") && request.get("ack").getAsBoolean();
 
             JsonElement result = execute(op, args);
+
             if (!ack) {
                 return null;
             }
@@ -38,6 +40,7 @@ public final class SyncRequestHandler {
             JsonObject response = new JsonObject();
             response.addProperty("id", id);
             response.add("result", result);
+
             return response.toString().getBytes(StandardCharsets.UTF_8);
         } catch (Exception e) {
             logger.warn("Failed to serve a backend storage call: " + e.getMessage());
@@ -45,6 +48,7 @@ public final class SyncRequestHandler {
             JsonObject response = new JsonObject();
             response.addProperty("id", id);
             response.addProperty("error", String.valueOf(e.getMessage()));
+
             return response.toString().getBytes(StandardCharsets.UTF_8);
         }
     }

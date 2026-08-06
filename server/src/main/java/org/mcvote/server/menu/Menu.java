@@ -22,6 +22,7 @@ public final class Menu {
         if (slot >= 0 && slot < size) {
             buttons.put(slot, button);
         }
+
         return this;
     }
 

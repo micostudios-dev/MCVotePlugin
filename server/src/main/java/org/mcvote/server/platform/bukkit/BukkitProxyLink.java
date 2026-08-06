@@ -35,15 +35,19 @@ public final class BukkitProxyLink implements NodeLink, PluginMessageListener {
     @Override
     public boolean send(byte[] frame) {
         Player carrier = anyPlayer();
+
         if (carrier == null) {
             return false;
         }
+
         scheduler.runForPlayer(carrier, () -> {
             Player current = carrier.isOnline() ? carrier : anyPlayer();
+
             if (current != null) {
                 current.sendPluginMessage(plugin, SyncProtocol.CHANNEL, frame);
             }
         });
+
         return true;
     }
 
@@ -52,7 +56,9 @@ public final class BukkitProxyLink implements NodeLink, PluginMessageListener {
         if (!SyncProtocol.CHANNEL.equals(channel)) {
             return;
         }
+
         RemoteVoteStorage target = storage;
+
         if (target != null) {
             target.handleResponse(message);
         }
@@ -62,6 +68,7 @@ public final class BukkitProxyLink implements NodeLink, PluginMessageListener {
         for (Player player : Bukkit.getOnlinePlayers()) {
             return player;
         }
+
         return null;
     }
 }

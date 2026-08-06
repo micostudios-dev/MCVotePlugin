@@ -1,0 +1,84 @@
+# MCVote - texts live in lang/<language>.yml, the GUIs in menu/*.yml.
+
+database:
+  # sqlite | mysql | proxy. On a network every backend uses "proxy": the proxy
+  # owns streaks, VoteParty and pending rewards, and is asked over plugin messaging.
+  type: sqlite
+  file: data/database.db
+  host: localhost
+  port: 3306
+  name: mcvote
+  user: root
+  password: ""
+  pool-size: 6
+
+# Only one node listens for votes: the proxy, or this server if it is standalone.
+receiver:
+  enabled: true
+  host: 0.0.0.0
+  port: 8192
+  # Votifier and NuVotifier both work unchanged. A token (token.txt) and a public
+  # key (rsa/public.key) are generated on first start and printed in the console;
+  # give the listing site whichever of the two it asks for.
+  tokens:
+    # Overrides token.txt. Add one entry per site to be able to revoke them
+    # separately - the key must match the service name that site sends.
+    default: ""
+  # Only for MCVote's own frame. Leave empty if your site speaks Votifier.
+  api-key: ""
+  # Replay window for Votifier v1, which has no challenge of its own.
+  replay-window-seconds: 300
+
+delivery:
+  poll-seconds: 5
+
+anti-abuse:
+  enabled: true
+  # Per player and site. The listing site already enforces its own 24h window,
+  # so keep this under a day: voting at 22:00 and again at 09:00 is legitimate,
+  # and a longer cooldown drops that vote (with a line in the console).
+  cooldown-seconds: 21600
+  # Across every site. 0 = no cap.
+  max-daily-votes: 16
+
+# Ships with en_us and es_es. Copy one to add your own.
+language: en_us
+
+streaks:
+  enabled: true
+  timezone: "UTC"
+  # <id>: days in a row needed. Paid out by rewards.streak.<id>
+  tiers:
+    day3: 3
+    week: 7
+    month: 30
+
+voteparty:
+  enabled: true
+  goal: 50
+  broadcast: "<gold><bold>VOTEPARTY!</bold> <yellow>Everyone online gets a reward."
+
+# "Name|https://url"
+vote-links:
+  - "MCVote|https://mcvote.org/servers/your-server"
+
+# One action per list entry: command, player, message, broadcast, item or sound.
+# Placeholders: %player% %streak% %best_streak% %votes% %party_progress%
+# %party_goal% %party_remaining% %next_tier% %next_tier_in%, and any
+# PlaceholderAPI placeholder when PlaceholderAPI is installed.
+rewards:
+  vote:
+    - "item: DIAMOND 1"
+    - "message: <green>+1 diamond for voting"
+    - "sound: entity.experience_orb.pickup 1 1"
+  streak:
+    day3:
+      - "command: give %player% gold_ingot 3"
+      - "message: <gold>+3 gold ingots for your 3-day streak"
+    week:
+      - "command: give %player% emerald 5"
+    month:
+      - "command: give %player% netherite_ingot 1"
+  party:
+    - "item: DIAMOND 5"
+    - "message: <light_purple>Enjoy the VoteParty!"

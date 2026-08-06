@@ -1,0 +1,62 @@
+# MCVote - English (en_us). Selected by "language" in config.yml.
+# An empty value ("") silences that message.
+#
+# Lines are MiniMessage, on Spigot too. The old & codes still work, but only in
+# a line with no MiniMessage tag at all - never mix both styles in one line.
+# The prefix is added to single messages, not to list entries.
+#
+# Placeholders: %player% %streak% %best_streak% %votes%
+#               %party_progress% %party_goal% %party_remaining%
+
+prefix: "<gray>[<aqua>MCVote</aqua>]</gray> "
+
+# Menu titles (the menu/*.yml files can override them with their own "title").
+menu-title: "&8» Vote"
+admin-title: "&8» Vote admin"
+
+# Sent when a reward is delivered.
+vote-received: "<green>Thanks for voting, <white>%player%</white>! <gray>(streak %streak%)"
+streak-milestone: "<gold>%streak%-day streak! Reward unlocked."
+party-reward: "<light_purple>VoteParty reward received!"
+
+# /vote streak
+streak-info: "<green>Streak: <white>%streak%</white> <gray>| Best: <white>%best_streak%</white> | Votes: <white>%votes%</white>"
+
+# /vote party
+party-progress: "<light_purple>VoteParty: <white>%party_progress%</white><gray>/<white>%party_goal%</white> <gray>(%party_remaining% to go)"
+party-disabled: "<gray>The VoteParty is disabled."
+
+# /vote top
+top-header: "<gold>Top voters"
+top-entry: "<gray>%rank%. <white>%player% <gray>- <white>%votes%"
+top-empty: "<gray>Nobody has voted yet."
+
+# /vote links, and the fallback when the menu is disabled.
+# links-entry is clickable: <click:open_url> opens the site in the browser.
+links-header: "<green>Vote at:"
+links-entry: "<gray>- <click:open_url:'%url%'><hover:show_text:'<gray>Open <white>%url%'><white><underlined>%name%</underlined></white></hover></click>"
+links-empty: "<gray>There are no vote links configured."
+
+# Admin and errors
+no-permission: "<red>You don't have permission."
+players-only: "<red>Players only."
+admin-console: "<red>Players only. From console use /vote reload or /vote forceparty."
+admin-menu-disabled: "<gray>The admin menu is disabled. Use /vote reload or /vote forceparty."
+reloaded: "<green>Configuration reloaded."
+party-forced: "<green>VoteParty forced."
+test-usage: "<red>Usage: /vote test [player]"
+test-queued: "<green>Test vote queued for <white>%player%"
+
+# /vote help. Add or remove lines freely.
+help:
+  - "<gold>/vote <gray>- open the menu / show the links"
+  - "<gold>/vote streak <gray>- your streak"
+  - "<gold>/vote top <gray>- top voters"
+  - "<gold>/vote party <gray>- VoteParty progress"
+
+# Only shown to players with mcvote.admin.
+help-admin:
+  - "<gold>/vote admin <gray>- admin menu"
+  - "<gold>/vote reload <gray>- reload config, lang and menus"
+  - "<gold>/vote forceparty <gray>- force a VoteParty"
+  - "<gold>/vote test [player] <gray>- queue a test vote"

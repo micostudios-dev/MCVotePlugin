@@ -1,0 +1,17 @@
+name: MCVote
+version: '${version}'
+main: org.mcvote.folia.FoliaMCVotePlugin
+api-version: '1.21'
+folia-supported: true
+authors: [mcvote]
+description: Votes, streaks and VoteParty for MCVote (Folia).
+softdepend: [PlaceholderAPI]
+commands:
+  vote:
+    description: Open the vote menu and utilities.
+  mcvote:
+    description: Alias of /vote.
+permissions:
+  mcvote.admin:
+    description: Access to admin menu, reload, forceparty and test.
+    default: op

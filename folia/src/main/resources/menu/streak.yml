@@ -1,0 +1,35 @@
+# MCVote - streak menu (/vote streak)
+#
+# The full list of placeholders and actions is in menu/main.yml.
+
+menus:
+
+  streak:
+    enabled: true
+    title: "&8» Streak"
+    rows: 3
+    items:
+      header:
+        slot: 4
+        material: BLAZE_POWDER
+        name: "&6Current streak: &f%streak%"
+        lore:
+          - "&7Best: &f%best_streak%"
+          - "&7Next: &f%next_tier% &7in &f%next_tier_in% &7day(s)"
+      back:
+        slot: 22
+        material: ARROW
+        name: "&7« Back"
+        actions:
+          - "open: main"
+    tiers:
+      enabled: true
+      start-slot: 10
+      unlocked-material: LIME_DYE
+      locked-material: GRAY_DYE
+      name: "&e%tier_id% &8(%tier_required% days)"
+      lore:
+        - "%tier_status%"
+        - "&7Missing: &f%tier_remaining% day(s)"
+      unlocked-status: "&aUnlocked"
+      locked-status: "&cLocked"

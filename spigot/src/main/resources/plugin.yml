@@ -1,0 +1,16 @@
+name: MCVote
+version: '${version}'
+main: org.mcvote.spigot.SpigotMCVotePlugin
+api-version: '1.21'
+authors: [mcvote]
+description: Votes, streaks and VoteParty for MCVote (Spigot).
+softdepend: [PlaceholderAPI]
+commands:
+  vote:
+    description: Open the vote menu and utilities.
+  mcvote:
+    description: Alias of /vote.
+permissions:
+  mcvote.admin:
+    description: Access to admin menu, reload, forceparty and test.
+    default: op

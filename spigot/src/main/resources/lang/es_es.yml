@@ -1,0 +1,62 @@
+# MCVote - Español (es_es). Se elige con "language" en config.yml.
+# Un valor vacío ("") deja ese mensaje sin enviar.
+#
+# Las líneas son MiniMessage, también en Spigot. Los códigos & siguen valiendo,
+# pero solo en una línea sin ninguna etiqueta MiniMessage: no mezcles los dos
+# estilos. El prefijo se añade a los mensajes sueltos, no a las listas.
+#
+# Placeholders: %player% %streak% %best_streak% %votes%
+#               %party_progress% %party_goal% %party_remaining%
+
+prefix: "<gray>[<aqua>MCVote</aqua>]</gray> "
+
+# Títulos de menú (cada menu/*.yml puede sobrescribirlos con su propio "title").
+menu-title: "&8» Votar"
+admin-title: "&8» Admin de votos"
+
+# Se envían al entregar una recompensa.
+vote-received: "<green>¡Gracias por votar, <white>%player%</white>! <gray>(racha %streak%)"
+streak-milestone: "<gold>¡Racha de %streak% días! Recompensa desbloqueada."
+party-reward: "<light_purple>¡Recompensa de VoteParty recibida!"
+
+# /vote streak
+streak-info: "<green>Racha: <white>%streak%</white> <gray>| Mejor: <white>%best_streak%</white> | Votos: <white>%votes%</white>"
+
+# /vote party
+party-progress: "<light_purple>VoteParty: <white>%party_progress%</white><gray>/<white>%party_goal%</white> <gray>(faltan %party_remaining%)"
+party-disabled: "<gray>La VoteParty está desactivada."
+
+# /vote top
+top-header: "<gold>Mejores votantes"
+top-entry: "<gray>%rank%. <white>%player% <gray>- <white>%votes%"
+top-empty: "<gray>Todavía no ha votado nadie."
+
+# /vote links, y lo que se muestra si el menú está desactivado.
+# links-entry es clicable: <click:open_url> abre la web en el navegador.
+links-header: "<green>Vota en:"
+links-entry: "<gray>- <click:open_url:'%url%'><hover:show_text:'<gray>Abrir <white>%url%'><white><underlined>%name%</underlined></white></hover></click>"
+links-empty: "<gray>No hay enlaces de voto configurados."
+
+# Admin y errores
+no-permission: "<red>No tienes permiso."
+players-only: "<red>Solo para jugadores."
+admin-console: "<red>Solo para jugadores. Desde consola usa /vote reload o /vote forceparty."
+admin-menu-disabled: "<gray>El menú de admin está desactivado. Usa /vote reload o /vote forceparty."
+reloaded: "<green>Configuración recargada."
+party-forced: "<green>VoteParty forzada."
+test-usage: "<red>Uso: /vote test [jugador]"
+test-queued: "<green>Voto de prueba encolado para <white>%player%"
+
+# /vote help. Puedes añadir o quitar líneas.
+help:
+  - "<gold>/vote <gray>- abre el menú / muestra los enlaces"
+  - "<gold>/vote streak <gray>- tu racha"
+  - "<gold>/vote top <gray>- mejores votantes"
+  - "<gold>/vote party <gray>- progreso de la VoteParty"
+
+# Solo se muestra a quien tenga mcvote.admin.
+help-admin:
+  - "<gold>/vote admin <gray>- menú de admin"
+  - "<gold>/vote reload <gray>- recarga config, lang y menús"
+  - "<gold>/vote forceparty <gray>- fuerza una VoteParty"
+  - "<gold>/vote test [jugador] <gray>- encola un voto de prueba"

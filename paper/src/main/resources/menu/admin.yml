@@ -1,0 +1,34 @@
+# MCVote - admin menu (/vote admin)
+#
+# The full list of placeholders and actions is in menu/main.yml.
+# "reload" and "forceparty" need the mcvote.admin permission.
+
+menus:
+
+  admin:
+    enabled: true
+    title: "&8» Vote admin"
+    rows: 3
+    items:
+      reload:
+        slot: 11
+        material: EMERALD
+        name: "&aReload configuration"
+        lore:
+          - "&7Reloads config.yml, lang/ and menu/"
+        actions:
+          - "reload"
+      forceparty:
+        slot: 13
+        material: TNT
+        name: "&cForce VoteParty"
+        lore:
+          - "&7Rewards everyone online right now"
+        actions:
+          - "forceparty"
+      party-info:
+        slot: 15
+        material: NETHER_STAR
+        name: "&dVoteParty: &f%party_progress%&7/&f%party_goal%"
+        lore:
+          - "&7Remaining: &f%party_remaining%"

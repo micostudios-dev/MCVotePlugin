@@ -1,0 +1,54 @@
+# MCVote - proxy. This node receives the votes and owns the state of the whole
+# network; the backends read it over plugin messaging and need no database.
+# Rewards, messages, menus and languages are configured on the backends.
+
+database:
+  # sqlite | mysql. A local file is enough unless you want to read the data
+  # from outside or run more than one proxy.
+  type: sqlite
+  file: database.db
+  host: localhost
+  port: 3306
+  name: mcvote
+  user: root
+  password: ""
+  pool-size: 6
+
+# The only public listener of the network - point your website at this host:port.
+receiver:
+  host: 0.0.0.0
+  port: 8192
+  # Votifier and NuVotifier both work unchanged. A token (token.txt) and a public
+  # key (rsa/public.key) are generated on first start and printed in the console;
+  # give the listing site whichever of the two it asks for.
+  tokens:
+    # Overrides token.txt. Add one entry per site to be able to revoke them
+    # separately - the key must match the service name that site sends.
+    default: ""
+  # Only for MCVote's own frame. Leave empty if your site speaks Votifier.
+  api-key: ""
+  # Replay window for Votifier v1, which has no challenge of its own.
+  replay-window-seconds: 300
+
+anti-abuse:
+  enabled: true
+  # Per player and site. The listing site already enforces its own 24h window,
+  # so keep this under a day: voting at 22:00 and again at 09:00 is legitimate,
+  # and a longer cooldown drops that vote (with a line in the console).
+  cooldown-seconds: 21600
+  # Across every site. 0 = no cap.
+  max-daily-votes: 16
+
+streaks:
+  enabled: true
+  timezone: "UTC"
+  # <id>: days in a row needed. Must match rewards.streak.<id> on the backends.
+  tiers:
+    day3: 3
+    week: 7
+    month: 30
+
+voteparty:
+  enabled: true
+  goal: 50
+  broadcast: "<gold><bold>VOTEPARTY!</bold> <yellow>Everyone online gets a reward."

@@ -1,0 +1,4 @@
+name: MCVote
+main: org.mcvote.bungee.BungeeMCVotePlugin
+version: '${version}'
+author: mcvote

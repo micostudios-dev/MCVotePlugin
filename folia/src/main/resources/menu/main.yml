@@ -1,0 +1,56 @@
+# MCVote - main menu (/vote). Every menu/*.yml is merged under "menus:".
+# These strings are not translated by lang/; edit them here. "enabled: false"
+# turns a menu off and the command answers in chat instead.
+#
+# Placeholders: %player% %streak% %best_streak% %votes% %party_progress%
+#   %party_goal% %party_remaining% %next_tier% %next_tier_required% %next_tier_in%
+#
+# actions:  open: <menu>    command: <cmd>   player: <cmd>   message: <text>
+#           close           reload          forceparty      (last two: mcvote.admin)
+#
+# Auto-fills, one per menu:
+#   links:  one icon per config.yml "vote-links" entry (%link_name% %link_url%)
+#   tiers:  one icon per streak tier (%tier_id% %tier_required% %tier_remaining% %tier_status%)
+
+menus:
+
+  main:
+    enabled: true
+    title: "&8» Vote"
+    rows: 3
+    items:
+      streak-info:
+        slot: 11
+        material: BLAZE_POWDER
+        name: "&6Your streak: &f%streak%"
+        lore:
+          - "&7Best streak: &f%best_streak%"
+          - "&7Total votes: &f%votes%"
+          - "&7Next reward: &f%next_tier% &7in &f%next_tier_in% &7day(s)"
+          - ""
+          - "&eClick to see the streak rewards"
+        actions:
+          - "open: streak"
+      party-info:
+        slot: 13
+        material: NETHER_STAR
+        name: "&dVoteParty: &f%party_progress%&7/&f%party_goal%"
+        lore:
+          - "&7Only &f%party_remaining% &7votes to go!"
+      help:
+        slot: 15
+        material: BOOK
+        name: "&aHow to vote"
+        lore:
+          - "&7Click a link and vote."
+          - "&7Rewards are given automatically."
+    links:
+      enabled: true
+      start-slot: 19
+      material: COMPASS
+      name: "&b%link_name%"
+      lore:
+        - "&7%link_url%"
+        - ""
+        - "&eClick to show the link"
+      click-message: "&aVote here &7» &f%link_url%"
